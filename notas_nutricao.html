@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notas – Nutrição Aplicada à Educação Física</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 32px 16px; }
+    header { background: #1a3a5c; color: white; width: 100%; max-width: 640px; border-radius: 12px 12px 0 0; padding: 24px 28px; text-align: center; }
+    header h1 { font-size: 1.3rem; font-weight: 700; letter-spacing: 0.5px; }
+    header p { font-size: 0.85rem; opacity: 0.8; margin-top: 6px; }
+    .search-box { background: white; width: 100%; max-width: 640px; padding: 20px 28px; border-left: 1px solid #dde3ea; border-right: 1px solid #dde3ea; }
+    .search-box label { display: block; font-size: 0.85rem; font-weight: 600; color: #444; margin-bottom: 8px; }
+    .search-row { display: flex; gap: 10px; }
+    .search-box input { flex: 1; padding: 10px 14px; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; outline: none; transition: border 0.2s; }
+    .search-box input:focus { border-color: #1a3a5c; }
+    .search-box button { padding: 10px 20px; background: #1a3a5c; color: white; border: none; border-radius: 8px; font-size: 0.95rem; cursor: pointer; }
+    .search-box button:hover { background: #27527a; }
+    #resultado { background: white; width: 100%; max-width: 640px; border-left: 1px solid #dde3ea; border-right: 1px solid #dde3ea; padding: 0 28px; min-height: 60px; }
+    .card { border: 1px solid #d0dce8; border-radius: 10px; margin: 18px 0; overflow: hidden; }
+    .card-header { background: #eaf0f8; padding: 12px 18px; font-weight: 700; color: #1a3a5c; font-size: 0.95rem; }
+    .card-body { padding: 14px 18px; }
+    .nota-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-size: 0.92rem; }
+    .nota-row:last-child { border-bottom: none; }
+    .nota-label { color: #555; }
+    .nota-value { font-weight: 700; font-size: 1.05rem; color: #1a3a5c; }
+    .nota-value.pendente { color: #aaa; font-weight: 400; font-style: italic; font-size: 0.88rem; }
+    .not-found { text-align: center; color: #c0392b; padding: 20px 0; font-size: 0.95rem; }
+    footer { background: #1a3a5c; color: rgba(255,255,255,0.65); width: 100%; max-width: 640px; border-radius: 0 0 12px 12px; padding: 14px 28px; font-size: 0.78rem; text-align: center; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>📋 Nutrição Aplicada à Educação Física</h1>
+  <p>Educação Física · Turma 2601-140-05-A · 2026/1 · Campus Alfenas</p>
+</header>
+<div class="search-box">
+  <label for="ra-input">Consultar por matrícula:</label>
+  <div class="search-row">
+    <input type="number" id="ra-input" placeholder="Digite sua matrícula..." autofocus>
+    <button onclick="buscar()">Buscar</button>
+  </div>
+</div>
+<div id="resultado"></div>
+<footer>UNIFENAS · Universidade José do Rosário Vellano · Dados acadêmicos 2026/1</footer>
+<script>
+const notas = [
+  { matricula: "213419241", MPN1: "4,00", MPN2: null, MPNI: null },
+  { matricula: "213531241", MPN1: "3,40", MPN2: null, MPNI: null },
+  { matricula: "214170241", MPN1: "1,50", MPN2: null, MPNI: null },
+  { matricula: "213331241", MPN1: "2,15", MPN2: null, MPNI: null },
+  { matricula: "203373221", MPN1: "2,00", MPN2: null, MPNI: null },
+  { matricula: "213461241", MPN1: "2,50", MPN2: null, MPNI: null },
+  { matricula: "210394241", MPN1: "1,50", MPN2: null, MPNI: null },
+  { matricula: "202475251", MPN1: null, MPN2: null, MPNI: null },
+  { matricula: "203965231", MPN1: "3,40", MPN2: null, MPNI: null },
+  { matricula: "211980241", MPN1: "1,50", MPN2: null, MPNI: null },
+  { matricula: "202499201", MPN1: "2,00", MPN2: null, MPNI: null },
+  { matricula: "211959241", MPN1: "3,40", MPN2: null, MPNI: null },
+  { matricula: "213039241", MPN1: "3,10", MPN2: null, MPNI: null },
+  { matricula: "212186241", MPN1: "2,50", MPN2: null, MPNI: null },
+  { matricula: "214770241", MPN1: "3,70", MPN2: null, MPNI: null },
+  { matricula: "211052241", MPN1: "3,40", MPN2: null, MPNI: null },
+  { matricula: "213580241", MPN1: "1,50", MPN2: null, MPNI: null },
+];
+function buscar() {
+  const ra = document.getElementById('ra-input').value.trim();
+  const div = document.getElementById('resultado');
+  if (!ra) { div.innerHTML = ''; return; }
+  const aluno = notas.find(a => a.matricula === ra);
+  if (!aluno) { div.innerHTML = `<div class="not-found">❌ Matrícula <strong>${ra}</strong> não encontrada.</div>`; return; }
+  const fmt = v => v ? `<span class="nota-value">${v}</span>` : `<span class="nota-value pendente">Não lançada</span>`;
+  div.innerHTML = `<div class="card"><div class="card-header">🎓 Matrícula ${aluno.matricula}</div><div class="card-body">
+    <div class="nota-row"><span class="nota-label">MPN1 – 1ª Avaliação</span>${fmt(aluno.MPN1)}</div>
+    <div class="nota-row"><span class="nota-label">MPN2 – 2ª Avaliação</span>${fmt(aluno.MPN2)}</div>
+    <div class="nota-row"><span class="nota-label">MPNI – Avaliação Integradora</span>${fmt(aluno.MPNI)}</div>
+  </div></div>`;
+}
+document.getElementById('ra-input').addEventListener('keydown', e => { if (e.key === 'Enter') buscar(); });
+</script>
+</body>
+</html>
